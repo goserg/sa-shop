@@ -1,0 +1,134 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Super Awesome Shop</title>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet"> 
+<link href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+	<div v-if="citySelector" class="city-selector">
+		<div @click="toggleCitySelect(false)" class="city-selector__back"></div>
+		<div class="city-selector__container">
+			<h1>Выберите город:</h1>
+			<div class="city-selector__container__cities">
+				<p @click="setCity(city)" v-for='city in cities'>{{city}}</p>
+			</div>
+		</div>
+	</div>
+	<header>
+		<div class="nav__bar">
+			<div class="logo">
+			shop!
+			</div>
+			<button class="catalog_button"> 
+			<div class="catalog_button__icon">
+				<div></div><div></div><div></div><div></div><div></div>
+			</div>
+			Каталог товаров
+			</button>
+			<div class="back"></div>
+			<div class="input">
+				<input @change="updateFilter" v-model="findField" placeholder="Я ищу...">
+				<button @click="updateFilter">найти</button>
+			</div>
+			<div class="nav__btn">
+				Войти
+			</div>
+			<div class="nav__btn">
+				Бонусы
+			</div>
+			<div class="nav__btn">
+				Корзина
+			</div>
+		</div>
+		<div class="nav__bottom">
+			<div class="city">
+				Ваш город: <span @click="toggleCitySelect(true)">{{ currentCity }}</span>
+				<div class="city__popup" v-if="cityPopup">
+				<h3>Ваш город – {{ currentCity }}?</h3>
+				<button class="city__yes" @click="cityPopup = false">Да, верно</button>
+				<button class="city__no" @click="toggleCitySelect(true)">Нет, не он</button>
+				</div>
+			</div>
+		</div>
+	</header>
+	<div class="main">
+		<h1>Мобильные телефоны</h1>
+		<div class="filters">
+			<div class="filters__price">
+				<span>Цена, Р.</span>
+				<input type="text" v-model="minPrice" @change="updateFilter" placeholder="min">
+				<input type="text" v-model="maxPrice" @change="updateFilter" placeholder="max">
+			</div>
+			<div class="filters__filter">
+				<span>Платформа</span>
+				<label v-for="platf in platforms">
+					<input type="checkbox" v-model="filters[platf]" @change="updateFilter">
+					{{ platf }}
+				</label>
+			</div>
+			<div class="filters__filter">
+				<span>Производители</span>
+				<label v-for="manuf in manufacturers">
+					<input type="checkbox" v-model="filters[manuf]" @change="updateFilter" checked>
+					{{ manuf }}
+				</label>
+			</div>
+		</div>
+		<div class=right>
+			<div class="page__indicator">
+				Страница {{ page+1 }} из {{ pages.length }}
+			</div>
+			<div class="catalog">
+				<div v-if="product.name != ''" v-for='product in catalogPage' class="catalog__card">
+					<div>
+						<div
+							v-if="product.discount > 0"
+							class="catalog__card__discount"
+						>
+							-{{ Math.floor(product.discount * 100) }}%
+						</div>
+						<div
+							class="catalog__card__pic"
+							:style="'background-image: url('+ product.img +');'"
+						></div>
+						<div class="catalog__card__price">
+							<span
+								class="catalog__card__price__final"
+								:style="product.discount > 0 ? 'color: #D50000;' : ''"
+							>
+								{{ getPrice(product) }} Р.
+							</span>
+							<span
+								v-if="product.discount > 0"
+								class="catalog__card__price__discount"
+							>
+								{{ product.price }}
+							</span>
+						</div>
+						<p class="catalog__card__name">{{ product.name }}</p>
+					</div>
+					<button class="catalog__card__btn">В корзину</button>
+				</div>
+			</div>
+			<p class="pagination">
+				<button
+					v-for="p in pages"
+					@click="page = p; window.scrollTo(0, 0);"
+					:class="p == page ? 'page__current' : ''"
+				>
+					{{ p+1 }}
+				</button>
+			</p>
+		</div>
+	</div>
+</div>
+<footer>
+	© 2020 OOO "Super Awesome Shop"
+</footer>
+<script src="main.js"></script>
+</body>
+</html>
