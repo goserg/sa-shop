@@ -257,12 +257,15 @@ catalog = [
 const app = new Vue({
 	el: "#app",
 	data: {
-		findField: '',
+		cart: undefined,
+		showCart: false,
+		showOrder: false,
 		cityPopup: true,
 		citySelector: false,
+		findField: '',
 		page: 0,
 		maxOnPage: 8,
-		currentCity: '',
+		currentCity: undefined,
 		cities: ['Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Казань', 'Нижний Новгород', 'Челябинск', 'Самара', 'Омск', 'Ростов-на-Дону'],
 		catalog: shuffle(catalog),
 		filteredCatalog: undefined,
@@ -272,18 +275,26 @@ const app = new Vue({
 		}
 	},
 	computed: {
+		uniquesInCart() {
+			uniques = []
+			for (let id of this.cart) {
+				if (uniques.indexOf(id) >= 0) continue
+				uniques.push(id)
+			}
+			return uniques
+		},
 		catalogPage() {
 			return this.filteredCatalog.slice(this.page * this.maxOnPage, (this.page + 1) * this.maxOnPage)
 		},
 		pages() {
-			pages = []
+			let pages = []
 			for (let i = 0; i < this.filteredCatalog.length; i += this.maxOnPage) {
 				pages.push(i / this.maxOnPage)
 			}
 			return pages
 		},
 		manufacturers() {
-			manufacturers = []
+			let manufacturers = []
 			for (let prod of this.catalog) {
 				if (manufacturers.indexOf(prod.brand) < 0) {
 					manufacturers.push(prod.brand)
@@ -293,7 +304,7 @@ const app = new Vue({
 			return manufacturers
 		},
 		platforms() {
-			platforms = []
+			let platforms = []
 			for (let prod of this.catalog) {
 				if (platforms.indexOf(prod.platform) < 0) {
 					platforms.push(prod.platform)
@@ -302,8 +313,49 @@ const app = new Vue({
 			}
 			return platforms
 		}
-	},	
+	},
+	watch: {
+		cart(val) {
+			localStorage.setItem('cart', this.cart)
+		}
+	},
 	methods: {
+		displayOrder(state) {
+			this.showOrder = state;
+			this.showCart = false;
+			this.cityPopup = false;
+			this.citySelector = false;
+		},
+		removeProductFromCart(id) {
+			this.cart.splice(this.cart.indexOf(id), 1)
+			if (this.cart.length == 0) {
+				this.showCart = false
+			}
+		},
+		clearCart() {
+			this.cart = []
+			this.showCart = false
+		},
+		addToCart(id) {
+			this.cart.push(id)
+			this.cart.sort()
+		},
+		getQuantityOfProductInCart(productId) {
+			let q = 0
+			for (let id of this.cart) {
+				if (id == productId) {
+					q++
+				}
+			}
+			return q
+		},
+		getProductById(id) {
+			for (let product of this.catalog) {
+				if (product.id == id) {
+					return product
+				}
+			}
+		},
 		getPrice(product) {
 			return Math.floor(product.price * (1 - product.discount))
 		},
@@ -318,7 +370,7 @@ const app = new Vue({
 			isPlatfOk = false;
 			for (let platf of this.platforms) {
 				if (prod.platform == platf && this.filters[platf]) isPlatfOk = true
-			}	
+			}
 			isManufOk = false;
 			for (let manuf of this.manufacturers) {
 				if (prod.brand == manuf && this.filters[manuf]) isManufOk = true
@@ -357,7 +409,9 @@ const app = new Vue({
 	},
 	created () {
 		this.currentCity = localStorage.getItem('city') || "Москва"
+		let cart = localStorage.getItem('cart')
+		console.log(cart)
+		this.cart = cart ? cart.split(',') : []
 		this.updateFilter()
-		console.log(this.pages)
 	}
 })

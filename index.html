@@ -23,12 +23,6 @@
 			<div class="logo">
 			shop!
 			</div>
-			<button class="catalog_button"> 
-			<div class="catalog_button__icon">
-				<div></div><div></div><div></div><div></div><div></div>
-			</div>
-			Каталог товаров
-			</button>
 			<div class="back"></div>
 			<div class="input">
 				<input @change="updateFilter" v-model="findField" placeholder="Я ищу...">
@@ -40,91 +34,130 @@
 			<div class="nav__btn">
 				Бонусы
 			</div>
-			<div class="nav__btn">
-				Корзина
+			<div @click="showCart = !showCart && cart.length > 0" class="nav__btn">
+				{{ cart.length > 0 ? "В корзине: " + cart.length : "Корзина пуста"}}
 			</div>
+			<transition name="slide-fade">
+				<div v-if="showCart" class="cart" key="cart">
+					<div class="cart__close-btn" @click="showCart = false">✖</div>
+					<h3>Корзина <i @click="clearCart">(очистить)</i></h3>
+					<transition-group name="slide-fade-list"  tag="p">
+						<div class="cart__product" v-for="id in uniquesInCart" :key="id">
+							<span>{{ getProductById(id).name }}</span>
+							<span class="cart__product__quantity">
+								{{ getQuantityOfProductInCart(id) }} шт.
+								<span class="cart__product__quantity__minus" @click="removeProductFromCart(id)">
+									-1
+								</span>
+							</span>
+						</div>
+					</transition-group>
+					<button @click="displayOrder(true)">К оформлению</button>
+				</div>
+			</transition>
 		</div>
 		<div class="nav__bottom">
 			<div class="city">
 				Ваш город: <span @click="toggleCitySelect(true)">{{ currentCity }}</span>
-				<div class="city__popup" v-if="cityPopup">
-				<h3>Ваш город – {{ currentCity }}?</h3>
-				<button class="city__yes" @click="cityPopup = false">Да, верно</button>
-				<button class="city__no" @click="toggleCitySelect(true)">Нет, не он</button>
-				</div>
+				<transition name="pop">
+					<div class="city__popup" v-if="cityPopup">
+						<h3>Ваш город – {{ currentCity }}?</h3>
+						<div class="city__popup__buttons">
+							<button class="city__yes" @click="cityPopup = false">Да, верно</button>
+							<button class="city__no" @click="toggleCitySelect(true)">Нет, не он</button>
+						<div>
+					</div>
+				</transition>
 			</div>
 		</div>
 	</header>
-	<div class="main">
-		<h1>Мобильные телефоны</h1>
-		<div class="filters">
-			<div class="filters__price">
-				<span>Цена, Р.</span>
-				<input type="text" v-model="minPrice" @change="updateFilter" placeholder="min">
-				<input type="text" v-model="maxPrice" @change="updateFilter" placeholder="max">
-			</div>
-			<div class="filters__filter">
-				<span>Платформа</span>
-				<label v-for="platf in platforms">
-					<input type="checkbox" v-model="filters[platf]" @change="updateFilter">
-					{{ platf }}
-				</label>
-			</div>
-			<div class="filters__filter">
-				<span>Производители</span>
-				<label v-for="manuf in manufacturers">
-					<input type="checkbox" v-model="filters[manuf]" @change="updateFilter" checked>
-					{{ manuf }}
-				</label>
-			</div>
-		</div>
-		<div class=right>
-			<div class="page__indicator">
-				Страница {{ page+1 }} из {{ pages.length }}
-			</div>
-			<div class="catalog">
-				<div v-if="product.name != ''" v-for='product in catalogPage' class="catalog__card">
-					<div>
-						<div
-							v-if="product.discount > 0"
-							class="catalog__card__discount"
-						>
-							-{{ Math.floor(product.discount * 100) }}%
-						</div>
-						<div
-							class="catalog__card__pic"
-							:style="'background-image: url('+ product.img +');'"
-						></div>
-						<div class="catalog__card__price">
-							<span
-								class="catalog__card__price__final"
-								:style="product.discount > 0 ? 'color: #D50000;' : ''"
-							>
-								{{ getPrice(product) }} Р.
-							</span>
-							<span
-								v-if="product.discount > 0"
-								class="catalog__card__price__discount"
-							>
-								{{ product.price }}
-							</span>
-						</div>
-						<p class="catalog__card__name">{{ product.name }}</p>
-					</div>
-					<button class="catalog__card__btn">В корзину</button>
+		<transition name="delay">
+		<div class="main" v-if="!showOrder" >
+			<h1>
+				Лучший магазин мобильных телефонов!
+				<span class="trigger">*</span>
+				<span class="hidden">по мнению жены</span>
+			</h1>
+			<div class="filters">
+				<div class="filters__price">
+					<span>Цена, Р.</span>
+					<input type="text" v-model="minPrice" @change="updateFilter" placeholder="min">
+					<input type="text" v-model="maxPrice" @change="updateFilter" placeholder="max">
+				</div>
+				<div class="filters__filter">
+					<span>Платформа</span>
+					<label v-for="platf in platforms">
+						<input type="checkbox" v-model="filters[platf]" @change="updateFilter">
+						{{ platf }}
+					</label>
+				</div>
+				<div class="filters__filter">
+					<span>Производители</span>
+					<label v-for="manuf in manufacturers">
+						<input type="checkbox" v-model="filters[manuf]" @change="updateFilter" checked>
+						{{ manuf }}
+					</label>
 				</div>
 			</div>
-			<p class="pagination">
-				<button
-					v-for="p in pages"
-					@click="page = p; window.scrollTo(0, 0);"
-					:class="p == page ? 'page__current' : ''"
-				>
-					{{ p+1 }}
-				</button>
-			</p>
+			<div class=right>
+				<div class="page__indicator">
+					Страница {{ page+1 }} из {{ pages.length }}
+				</div>
+				<div class="catalog">
+					<div v-if="product.name != ''" v-for='product in catalogPage' class="catalog__card">
+						<div>
+							<div
+								v-if="product.discount > 0"
+								class="catalog__card__discount"
+							>
+								-{{ Math.floor(product.discount * 100) }}%
+							</div>
+							<div
+								class="catalog__card__pic"
+								:style="'background-image: url('+ product.img +');'"
+							></div>
+							<div class="catalog__card__price">
+								<span
+									class="catalog__card__price__final"
+									:style="product.discount > 0 ? 'color: #D50000;' : ''"
+								>
+									{{ getPrice(product) }} Р.
+								</span>
+								<span
+									v-if="product.discount > 0"
+									class="catalog__card__price__discount"
+								>
+									{{ product.price }}
+								</span>
+							</div>
+							<p class="catalog__card__name">{{ product.name }}</p>
+						</div>
+						<button class="catalog__card__btn" @click="addToCart(product.id)">В корзину</button>
+					</div>
+				</div>
+				<p class="pagination">
+					<button
+						v-for="p in pages"
+						@click="page = p; window.scrollTo(0, 0);"
+						:class="p == page ? 'page__current' : ''"
+					>
+						{{ p+1 }}
+					</button>
+				</p>
+			</div>
 		</div>
-	</div>
+	</transition>
+	<transition name="scale-up">
+		<div v-if="showOrder" class="order">
+			<div class="order__container">
+				<div>
+					<h2>Раздел оплаты товара находтся в разработке</h2>
+					
+					<button @click="displayOrder(false)">OK</button>
+				</div>
+			</div>
+		</div>
+	<transition>
 </div>
 <footer>
 	© 2020 OOO "Super Awesome Shop"

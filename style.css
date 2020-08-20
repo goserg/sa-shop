@@ -7,7 +7,6 @@
 	--grey-dark: #757575;
 	--grey-light: #E0E0E0;
 	--max-width: 1250px;
-	
 }
 
 * {
@@ -23,8 +22,19 @@ body {
 	justify-content: space-between;
 	min-height: 100vh;
 }
-button: {
+button {
 	outline: 0;
+	background: var(--accent-color);
+	font-size: 16px;
+	color: white;
+	width: max-content;
+	border: 0;
+	padding: 5px 20px;
+	cursor: pointer;
+	border-radius: 2px;
+}
+button:hover {
+	background: var(--accent-color-09);
 }
 button:focus,
 input:focus {
@@ -35,7 +45,7 @@ input:focus {
 /* CITY SELECTOR */
 .city-selector {
 	position: fixed;
-	z-index: 999;
+	z-index: 9999;
 	width: 100vw;
 	height: 100vh;
 	display: flex;
@@ -81,11 +91,11 @@ header {
 	margin: auto;
 	display: grid;
 	grid-gap: 30px;
-	grid-template-columns: max-content max-content 1fr max-content max-content max-content
+	grid-template-columns: max-content 1fr max-content max-content max-content
 }
 .back {
 	position: absolute;
-	width: 100%;
+	width: 100vw;
 	height: 100px;
 	border-top: 100px solid var(--main-color);
 	border-right: 100vw solid transparent;
@@ -99,35 +109,6 @@ header {
 	font-weight: bold;
 	user-select: none;
 }
-.catalog_button {
-	background: var(--accent-color);
-	font-size: 16px;
-	color: white;
-	height: 50px;
-	padding: 15px 15px;
-	line-height: 20px;
-	text-align: center;
-	align-self: center;
-	cursor: pointer;
-	border-radius: 2px;
-	border: 0;
-	display: flex;
-}
-.catalog_button:hover {
-	background: var(--accent-color-09);
-}
-.catalog_button__icon {
-	width: 17px;
-	height: 12px;
-	align-self: center;
-	margin-right: 5px;
-	display: grid;
-	grid-template-rows: 2px 1fr 2px 1fr 2px;
-}
-.catalog_button__icon div:nth-child(2n - 1) {
-	background: white;
-}
-
 .input {
 	align-self: center;
 	height: 50px;
@@ -146,21 +127,6 @@ header {
 }
 .input input:focus {
 	box-shadow: inset 0 0 0 2px var(--accent-color);
-}
-.input button {
-	background: var(--accent-color);
-	font-size: 16px;
-	color: white;
-	width: 100px;
-	height: 100%;
-	border: 0;
-	padding: 0 20px;
-	cursor: pointer;
-	border-top-right-radius: 2px;
-	border-bottom-right-radius: 2px;
-}
-.input button:hover {
-	background: var(--accent-color-09);
 }
 
 .nav__btn {
@@ -196,6 +162,7 @@ header {
 	opacity: 60%;
 }
 .city__popup {
+	max-width: max-content;
 	color: black;
 	position: absolute;
 	background: white;
@@ -219,7 +186,12 @@ header {
 	font-size: 20px;
 	text-align: left;
 }
+.city__popup__buttons {
+	width: max-content;
+	display: flex;
+}
 .city__yes {
+	width: max-content;
 	background: var(--accent-color);
 	border: 0;
 	color: white;
@@ -240,6 +212,73 @@ header {
 	cursor: pointer;
 	font-size: 16px;
 }
+.city__no:hover {
+	background: 0;
+}
+/* CART */
+.cart {
+	z-index: 3000;
+	color: black;
+	position: fixed;
+	right: 5px;
+	top: 5px;
+	padding: 20px;
+	background: white;
+	border: solid 1px var(--dark-color);
+	font-weight: 300;
+	display: flex;
+	flex-direction: column;
+}
+
+.cart button {
+	align-self: center;
+	margin-top: 20px;
+}
+
+.cart__close-btn {
+	position: absolute;
+	right: 5px;
+	top: 0;
+	padding: 3px;
+	cursor: pointer;
+}
+.cart__close-btn:hover {
+	color: var(--accent-color);
+}
+.cart h3 {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.cart h3 i {
+	font-weight: 300;
+	font-size: 14px;
+	cursor: pointer;
+}
+.cart h3 i:hover {
+	color: var(--accent-color);
+}
+.cart__product {
+	display: flex;
+	justify-content: space-between;
+	transition: all 0.3s;
+}
+.cart__product:hover {
+	color: var(--accent-color);
+}
+.cart__product span {
+	display: inline-block;
+}
+.cart__product__quantity {
+	margin-left: 50px;
+}
+.cart__product__quantity__minus {
+	display: inline-block;
+	padding: 0 0 0 10px;
+	cursor: pointer;
+	font-size: 10px;
+	user-select: none;
+}
+
 /* MAIN */
 .main {
 	padding:30px;
@@ -253,6 +292,25 @@ header {
 	grid-template-areas:
 	"head head"
 	"filters main";
+}
+.main h1 {
+	font-weight: 300;
+	color: var(--dark-color);
+}
+.hidden {
+	opacity: 0;
+	display: inline-block;
+	transition: 0.3s all;
+	font-size: 14px;
+	transform-origin: left;
+	transform: translateY(-50px) rotate(-90deg);
+}
+.main h1 .trigger {
+	cursor: pointer;
+}
+.trigger:hover~.hidden {
+	opacity: 100%;
+	transform: translateY(-20px);
 }
 input[type="text"] {
 	padding: 0.8rem 1rem;
@@ -366,15 +424,15 @@ h1 {
 
 /* PAGINATION */
 .page__indicator {
-	max-width: max-content;
-	margin: 20px auto;
+	margin: 20px 0;
 }
 
 .pagination {
-	max-width: max-content;
-	margin: 20px auto;
+	margin: 20px 0;
 }
 .pagination button {
+	background-color: white;
+	color: var(--dark-color);
 	display: inline-block;
 	padding: 0.3rem;
 	margin: 3px;
@@ -392,6 +450,33 @@ h1 {
 	color: white;
 }
 
+/* ORDER */
+.order {
+	position: fixed;
+	z-index: 2000;
+	left: 0;
+	right: 0;
+	bottom: 100px;
+	top: 125px;
+	display: flex;
+}
+.order__container {
+	background: white;
+	width: 1250px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+}
+.order__container div{
+	max-width: max-content;
+	margin: 30px auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.order__container div h2 {
+	margin-bottom: 30px;
+}
 
 /* FOOTER */
 footer {
@@ -405,6 +490,47 @@ footer {
 }
 
 
+/* TRANSITIONS */
+/* cart */
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all .2s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
+}
+/* city */
+.pop-enter-active, .pop-leave-active {
+  transition: all .2s ease;
+  transform-origin: right top;
+}
+.pop-enter, .pop-leave-to {
+  transform: scale(0);
+  opacity: 0;
+}
+/* cart items */
+.slide-fade-list-enter, .slide-fade-list-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+.slide-fade-list-leave-active {
+  position: absolute;
+}
+/* order */
+.scale-up-leave-active, .scale-up-enter-active {
+  transition: all .8s ease;
+}
+.scale-up-enter, .scale-up-leave-to {
+  transform: translateY(100vh);
+}
+/* main */
+.delay-leave-active, .delay-enter-active {
+  transition: all .8s;
+}
+.delay-enter, .delay-leave-to {
+  transform: translateY(100vh);
+}
+
 @media (max-width: 1250px) {
 	.catalog {
 		grid-template-columns: repeat(3, max-content);
@@ -416,10 +542,6 @@ footer {
 		grid-template-columns: repeat(2, max-content);
 	}
 }
-
-
-
-
 
 
 
